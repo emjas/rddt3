@@ -1,0 +1,58 @@
+- cache('index.html.haml', expires_in: 6.hours, skip_digest: true) do
+  %h1 RDDT3 Roster
+
+  %table#roster.table.table-striped
+    %thead
+      %tr
+        %th{data: {sort: 'string-ins'}}
+          Name
+          %span.glyphicon.glyphicon-sort
+        %th{data: {sort: 'int'}}
+          Role
+          %span.glyphicon.glyphicon-sort
+        %th{data: {sort: 'int'}}
+          Last Played
+          %span.glyphicon.glyphicon-sort
+        %th{data: {sort: 'int'}}
+          Join Date
+          %span.glyphicon.glyphicon-sort
+        %th{data: {sort: 'string-ins'}}
+          Tier-8 Tank? (not prem.)
+          %span.glyphicon.glyphicon-sort
+        %th{data: {sort: 'int'}}
+          Resources
+          %span.glyphicon.glyphicon-sort
+        %th{data: {sort: 'string-ins'}}
+          Soldier Eligible
+          %span.glyphicon.glyphicon-sort
+        %th{data: {sort: 'string-ins'}}
+          Reddit Name
+          %span.glyphicon.glyphicon-sort
+    %tbody
+      - @users.each do |member|
+        %tr
+          %td
+            = link_to member.nickname, "http://worldoftanks.com/community/accounts/#{member.account_id}/"
+          %td{data: {'sort-value' => member.clan_role_value}}
+            = member.clan_role
+          - played_date_class = member.last_battle_time < 1.month.ago ? 'danger' : ''
+          %td{class: played_date_class, data: {'sort-value' => member.last_battle_time.to_i}}
+            = member.last_battle_time.strftime('%Y-%m-%d')
+          - join_date_class = member.soldier_eligibility_join_date ? '' : 'danger'
+          %td{class: join_date_class, data: {'sort-value' => member.clan_joined_date.to_i}}
+            = member.clan_joined_date.strftime('%Y-%m-%d')
+          - tier_8_class = member.soldier_eligibility_tank_requirement ? '' : 'danger'
+          %td{class: tier_8_class}
+            = member.soldier_eligibility_tank_requirement ? 'yes' : 'no'
+          - resources_class = member.soldier_eligibility_resources ? '' : 'danger'
+          %td{class: resources_class}
+            = member.resources ? member.resources : '-'
+          - if member.soldier_eligible?
+            %td
+              yes
+          - else
+            %td.danger
+              no
+          - redditc = member.reddit_name == nil ? 'warning' : ''
+          %td{class: redditc, data: {'sort-value' => (member.reddit_name ? member.reddit_name : "")}}
+            = member.reddit_name ? link_to(member.reddit_name, "http://reddit.com/u/#{member.reddit_name}") : "???"

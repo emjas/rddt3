@@ -1,0 +1,82 @@
+h1 RDDT3 Roster
+
+table#roster.table.table-striped
+  thead
+    tr
+      th data-sort='string-ins'
+        | Name
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | Role
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | Last Played
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | Join Date
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | Days In Clan
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | Resources
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | -1 Week
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | -2 Weeks
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | -3 Weeks
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | -4 Weeks
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | -1 Month
+        span.glyphicon.glyphicon-sort
+      th data-sort='string-ins'
+        | Private Eligible
+        span.glyphicon.glyphicon-sort
+      th data-sort='string-ins'
+        | Jr. Officer Eligible
+        span.glyphicon.glyphicon-sort
+      th data-sort='string-ins'
+        | Reddit Name
+        span.glyphicon.glyphicon-sort
+  tbody
+    - @players.each do |player, eligibility|
+      tr
+        td
+          = link_to player.nickname, "http://worldoftanks.com/community/accounts/#{player.account_id}/"
+        td data-sort-value=@clan.member_role_index(player.account_id)
+          = @clan.member_role(player.account_id)
+        td class=last_played_date_class(player) data-sort-value=player.last_battle_time.to_i
+          = player.last_battle_time.strftime('%Y-%m-%d')
+        td class=join_date_class(eligibility) data-sort-value=@clan.member_join_date(player.account_id).to_i
+          = @clan.member_join_date(player.account_id).strftime('%Y-%m-%d')
+        td class=join_date_class(eligibility) data-sort-value=@clan.member_join_date(player.account_id).to_i
+          = member_join_date_days(@clan, player)
+        td data-sort-value=value_sub_nil(player.resource_report[:latest],-1)
+          = value_sub_nil(player.resource_report[:latest],'-')
+        - @dates.each do |date|
+          td data-sort-value=value_sub_nil(player.resource_report[:weekly_diff][date.to_i],-1)
+            = value_sub_nil(player.resource_report[:weekly_diff][date.to_i],'-')
+        td class=(eligibility.monthly_resource_requirement? ? '' : 'danger') data-sort-value=value_sub_nil(player.resource_report[:monthly],-1)
+          = value_sub_nil(player.resource_report[:monthly],'-')
+        - if eligibility.soldier_eligible?
+          td.success
+            | yes
+        - else
+          td
+            | no
+        - if eligibility.officer_eligible?
+          td.success
+            | yes
+        -else
+          td
+            | no
+        - redditc = player.reddit_name == nil ? 'warning' : ''
+        td class=redditc data-sort-value=(player.reddit_name ? player.reddit_name : "")
+          = player.reddit_name ? link_to(player.reddit_name, "http://reddit.com/u/#{player.reddit_name}") : "???"

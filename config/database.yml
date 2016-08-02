@@ -1,0 +1,19 @@
+development: &development
+  adapter: mysql2
+  encoding: utf8
+  database: rddt3_dev
+  username: rddt3
+  password: password
+  host: 127.0.0.1
+  port: 3306
+  reconnect: true
+
+test:
+  <<: *development
+  database: rddt3_test
+
+production:
+  <<: *development
+  database: rddt3_prod
+  username: rddt3
+  password: password

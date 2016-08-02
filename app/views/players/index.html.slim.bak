@@ -1,0 +1,80 @@
+h1 RDDT3 Roster
+
+table#roster.table.table-striped
+  thead
+    tr
+      th data-sort='string-ins'
+        | Name
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | Role
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | Last Played
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | Join Date
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | Days In Clan
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | Resources
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | -1 Week
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | -2 Weeks
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | -3 Weeks
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | -4 Weeks
+        span.glyphicon.glyphicon-sort
+      th data-sort='int'
+        | -1 Month
+        span.glyphicon.glyphicon-sort
+      th data-sort='string-ins'
+        | Soldier Eligible
+        span.glyphicon.glyphicon-sort
+      th data-sort='string-ins'
+        | Reddit Name
+        span.glyphicon.glyphicon-sort
+  tbody
+    - @players.each do |member, eligibility|
+      tr
+        td
+          = link_to member.nickname, "http://worldoftanks.com/community/accounts/#{member.account_id}/"
+        td data-sort-value=@clan.member_role_value(member.account_id)
+          = @clan.member_role(member.account_id)
+        td class=member.last_played_date_class data-sort-value=member.last_battle_time.to_i
+          = member.last_battle_time.strftime('%Y-%m-%d')
+        td class=member.join_date_class data-sort-value=@clan.member_join_date(member.account_id).to_i
+          = @clan.member_join_date(member.account_id).strftime('%Y-%m-%d')
+        td class=member.join_date_class data-sort-value= @clan.member_join_date(member.account_id).to_i
+          = (DateTime.now - @clan.member_join_date(member.account_id)).to_i
+        td class=member.resources_class 
+          = member.latest_recorded_resource ? member.latest_recorded_resource_count : '-'
+        td data-sort-value=resource_counts(member.resources_at(member.latest_recorded_resource_date - 1.week), member.latest_recorded_resource_count).to_i
+          = resource_counts(member.resources_at(member.latest_recorded_resource_date - 1.week), member.latest_recorded_resource_count)
+        td data-sort-value=resource_counts(member.resources_at(member.latest_recorded_resource_date - 2.weeks), member.resources_at(member.latest_recorded_resource_date - 1.week)).to_i
+          = resource_counts(member.resources_at(member.latest_recorded_resource_date - 2.weeks), member.resources_at(member.latest_recorded_resource_date - 1.week))
+        td data-sort-value=resource_counts(member.resources_at(member.latest_recorded_resource_date - 3.weeks), member.resources_at(member.latest_recorded_resource_date - 2.weeks)).to_i
+          = resource_counts(member.resources_at(member.latest_recorded_resource_date - 3.weeks), member.resources_at(member.latest_recorded_resource_date - 2.weeks))
+        td data-sort-value=resource_counts(member.resources_at(member.latest_recorded_resource_date - 4.weeks), member.resources_at(member.latest_recorded_resource_date - 3.weeks)).to_i
+          = resource_counts(member.resources_at(member.latest_recorded_resource_date - 4.weeks), member.resources_at(member.latest_recorded_resource_date - 3.weeks))
+        - rc = resource_counts(member.resources_at(member.latest_recorded_resource_date - 4.weeks), member.latest_recorded_resource_count)
+        - rc_class = rc != '-' && rc.to_i < 300 ? 'danger' : ''
+        td class=rc_class data-sort-value=resource_counts(member.resources_at(member.latest_recorded_resource_date - 4.weeks), member.latest_recorded_resource_count).to_i
+          = resource_counts(member.resources_at(member.latest_recorded_resource_date - 4.weeks), member.latest_recorded_resource_count)
+        - if eligibility.soldier_eligible?
+          td
+            | yes
+        - else
+          td.danger
+            | no
+        - redditc = member.reddit_name == nil ? 'warning' : ''
+        td class=redditc data-sort-value=(member.reddit_name ? member.reddit_name : "")
+          = member.reddit_name ? link_to(member.reddit_name, "http://reddit.com/u/#{member.reddit_name}") : "???"

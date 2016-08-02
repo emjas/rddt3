@@ -1,0 +1,18 @@
+- if flash.alert
+  %p= flash.alert
+
+%table
+  %thead
+    %tr
+      %th Name
+      %th Resources
+  %tbody
+    - @resources.each do |resource|
+      %tr
+        %td= resource.player.nickname
+        %td= resource.count
+  
+
+= form_tag({controller: "resources", action: "create"}, method: "post") do
+  = text_area_tag(:resources_dump)
+  = submit_tag("Submit")
